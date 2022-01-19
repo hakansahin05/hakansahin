@@ -1,0 +1,137 @@
+---
+title: "HWIV"
+author: "HakanSahin"
+date: "6/14/2021"
+output: word_document
+---
+
+
+```{r, message=FALSE, warning=FALSE}
+library(knitr) 
+library(ggplot2) 
+library(gridExtra) 
+library(GGally) 
+load("C:/hakan/crimes.RData")
+```
+
+
+1
+
+```{r, message=FALSE, warning=FALSE}
+head(crimes)
+dim(crimes)
+names(crimes)
+str(crimes)
+summary(crimes)
+```
+
+
+
+
+```{r, message=FALSE, warning=FALSE}
+scrimes=data.frame(scale(crimes)) 
+```
+
+
+2
+
+
+```{r, message=FALSE, warning=FALSE}
+km.out=kmeans(scrimes,2,nstart=20) 
+ls(km.out) 
+```
+
+
+
+
+
+
+```{r, message=FALSE, warning=FALSE}
+scrimes$cluster=as.factor(km.out$cluster) 
+kable(head(scrimes)) 
+```
+
+
+
+
+3
+
+```{r, message=FALSE, warning=FALSE}
+ggpairs(scrimes, columns=1:4, aes(colour=scrimes$cluster),upper="blank") 
+```
+
+
+
+
+4
+
+```{r, message=FALSE, warning=FALSE}
+wss=array() 
+for (i in 2:15){ 
+  wss[i]=kmeans(scrimes[,-5],i,nstart=10)$tot.withinss 
+} 
+plot(2:15,wss[-1],type="b") 
+```
+
+
+
+
+5
+
+```{r, message=FALSE, warning=FALSE}
+km.out=kmeans(scrimes[,-5],4,nstart=20) 
+scrimes$cluster=as.factor(km.out$cluster) 
+ggpairs(scrimes, columns=1:4, ggplot2::aes(colour=scrimes$cluster),upper="blank") 
+```
+
+
+
+
+
+
+```{r, message=FALSE, warning=FALSE}
+ggplot(scrimes, aes(x=homicide, y=assault)) + 
+  geom_point() + 
+  geom_text(label=rownames(scrimes), color=scrimes$cluster, nudge_x = 0.25, nudge_y = 0.25, check_overlap = T) 
+```
+
+
+
+6
+
+
+```{r, message=FALSE, warning=FALSE}
+crimes$cluster=as.factor(km.out$cluster) 
+kable(crimes) 
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+c1=crimes[crimes$cluster==1,] 
+c2=crimes[crimes$cluster==2,] 
+c3=crimes[crimes$cluster==3,] 
+c4=crimes[crimes$cluster==4,] 
+summary(c1[,-5]) 
+```
+
+
+
+```{r, message=FALSE, warning=FALSE}
+summary(c2[,-5]) 
+```
+
+
+
+```{r, message=FALSE, warning=FALSE}
+summary(c3[,-5]) 
+```
+
+
+
+```{r, message=FALSE, warning=FALSE}
+summary(c4[,-5]) 
+```
+
+
+
+
